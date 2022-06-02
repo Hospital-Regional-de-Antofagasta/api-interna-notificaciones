@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name:
+    {
+      {
+        (include "api-interna-notificaciones.fullname" .) | printf "%s-service",
+      },
+    }
+  namespace: { { .Release.Namespace } }
+  labels: { { - include "api-interna-notificaciones.labels" . | nindent 4 } }
+spec:
+  type: { { .Values.service.type } }
+  ports:
+    - port: { { .Values.service.port } }
+      targetPort: { { .Values.service.targetPort } }
+      protocol: TCP
+      name: http
+  selector:
+    { { - include "api-interna-notificaciones.selectorLabels" . | nindent 4 } }
