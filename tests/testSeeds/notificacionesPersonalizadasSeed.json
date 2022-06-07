@@ -134,5 +134,22 @@
     "codigoEstablecimiento": "HRA",
     "nombreEstablecimiento": "Hospital Regional Antofagasta Dr. Leonardo Guzmán",
     "deletedAt": "2022-05-30"
+  },
+  {
+    "_id": "000000000009",
+    "correlativo": 2,
+    "idOneSignal": "asd124",
+    "tituloEs": "titulo 1",
+    "mensajeEs": "mensaje 1",
+    "tituloEn": "",
+    "mensajeEn": "",
+    "rutPaciente": "22222222-2",
+    "estado": "RECIBIDA",
+    "fechaCreacion": "2022-05-02",
+    "leida": true,
+    "fijada": true,
+    "codigoEstablecimiento": "HRA",
+    "nombreEstablecimiento": "Hospital Regional Antofagasta Dr. Leonardo Guzmán",
+    "deletedAt": null
   }
 ]
