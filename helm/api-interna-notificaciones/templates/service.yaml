@@ -4,7 +4,7 @@ metadata:
   name:
     {{ (include "api-interna-notificaciones.fullname" .) | printf "%s-service" }}
   namespace: {{ .Release.Namespace }}
-  labels: {{ - include "api-interna-notificaciones.labels" . | nindent 4 }}
+  labels: {{- include "api-interna-notificaciones.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
