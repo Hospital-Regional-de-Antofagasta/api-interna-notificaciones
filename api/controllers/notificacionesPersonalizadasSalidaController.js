@@ -6,6 +6,10 @@ exports.create = async (req, res) => {
   const notificacionesInsertadas = [];
   try {
     const notificaciones = req.body;
+    if (notificaciones.length < 1)
+      return res
+        .status(400)
+        .send({ error: "No se recibieron notificaciones (arreglo vacío)." });
     for (let datosNotificacion of notificaciones) {
       try {
         const notificacion = new NotificacionesPersonalizadas(
@@ -41,7 +45,8 @@ exports.create = async (req, res) => {
         }
         // si la notificacion no existe, se envia y se inserta
         const idsSuscriptor = await getIdsSuscriptor(notificacion.rutPaciente);
-        if (!idsSuscriptor) {
+
+        if (!Array.isArray(idsSuscriptor)) {
           notificacionesInsertadas.push({
             afectado: notificacion.correlativo,
             realizado: false,
@@ -54,19 +59,11 @@ exports.create = async (req, res) => {
           notificacion.tituloEs,
           idsSuscriptor
         );
-        if (!oneSignalResponse) {
-          notificacionesInsertadas.push({
-            afectado: notificacion.correlativo,
-            realizado: false,
-            error: `${idOneSignal.name} - ${idOneSignal.message}`,
-          });
-          continue;
-        }
         if (!oneSignalResponse.id) {
           notificacionesInsertadas.push({
             afectado: notificacion.correlativo,
             realizado: false,
-            error: `No se obtuvo el id de oneSignal.`,
+            error: `${idOneSignal.name} - ${idOneSignal.message}`,
           });
           continue;
         }
@@ -108,8 +105,11 @@ const isNotificacionValid = async (notificacion, notificacionesInsertadas) => {
   const errorValidacion = notificacion.validateSync();
   if (errorValidacion) {
     let errors = "";
-    for (let prop in errorValidacion.errors)
-      errors += `${errorValidacion.errors[prop].message} `;
+    for (let prop in errorValidacion.errors) {
+      const separador =
+        prop === Object.keys(errorValidacion.errors).pop() ? "" : " ";
+      errors += `${errorValidacion.errors[prop].message}${separador}`;
+    }
     notificacionesInsertadas.push({
       afectado: notificacion.correlativo,
       realizado: false,

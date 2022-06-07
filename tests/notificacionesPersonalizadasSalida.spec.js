@@ -30,6 +30,7 @@ beforeEach(async () => {
       useUnifiedTopology: true,
     }
   );
+
   await NotificacionesPersonalizadas.create(notificacionesPersonalizadasSeed, {
     validateBeforeSave: false,
   });
@@ -42,7 +43,7 @@ afterEach(async () => {
 
 describe("Endpoints notificaciones salida", () => {
   describe("POST /inter-mongo-notificaciones/salida", () => {
-    it("Should not save notificacion without token", async () => {
+    it("Debería retornar error si no se recibe token.", async () => {
       const response = await request
         .post("/inter-mongo-notificaciones/salida")
         .send(notificacionPersonalizadaGuardar);
@@ -60,7 +61,7 @@ describe("Endpoints notificaciones salida", () => {
 
       expect(notificacionPersonalizadaDespues).toBeFalsy();
     });
-    it("Should not save notificacion with invalid token", async () => {
+    it("Debería retornar error si el token es invalido.", async () => {
       const response = await request
         .post("/inter-mongo-notificaciones/salida")
         .set("Authorization", "no-token")
@@ -79,110 +80,114 @@ describe("Endpoints notificaciones salida", () => {
 
       expect(notificacionPersonalizadaDespues).toBeFalsy();
     });
-    // it("Should save notificacion personalizada", async () => {
-    //   const response = await request
-    //     .post("/inter-mongo-notificaciones/salida")
-    //     .set("Authorization", token)
-    //     .send([notificacionPersonalizadaGuardar]);
+    it("Debería retornar error si no se envían notificaciones (body vacío).", async () => {
+      const response = await request
+        .post("/inter-mongo-notificaciones/salida")
+        .set("Authorization", token)
+        .send();
 
-    //   expect(response.status).toBe(201);
+      expect(response.status).toBe(500);
+    });
+    it("Debería retornar error si no se envían notificaciones (arreglo vacío).", async () => {
+      const response = await request
+        .post("/inter-mongo-notificaciones/salida")
+        .set("Authorization", token)
+        .send([]);
 
-    //   const notificacionPersonalizadaDespues =
-    //     await NotificacionesPersonalizadas.findOne({
-    //       correlativo: notificacionPersonalizadaGuardar.correlativo,
-    //       codigoEstablecimiento:
-    //         notificacionPersonalizadaGuardar.codigoEstablecimiento,
-    //     });
+      expect(response.status).toBe(400);
 
-    //   expect(notificacionPersonalizadaDespues).toBeTruthy();
-    //   expect(notificacionPersonalizadaDespues.correlativo).toBe(
-    //     notificacionPersonalizadaGuardar.correlativo
-    //   );
-    //   expect(notificacionPersonalizadaDespues.rutPaciente).toBe(
-    //     notificacionPersonalizadaGuardar.rutPaciente
-    //   );
-    //   expect(Date.parse(notificacionPersonalizadaDespues.fecha)).toBe(
-    //     Date.parse(notificacionPersonalizadaGuardar.fecha)
-    //   );
-    //   expect(notificacionPersonalizadaDespues.identificador).toBe(
-    //     notificacionPersonalizadaGuardar.identificador
-    //   );
-    //   expect(notificacionPersonalizadaDespues.valor).toBe(
-    //     notificacionPersonalizadaGuardar.valor
-    //   );
-    //   expect(notificacionPersonalizadaDespues.notificacion).toBe(
-    //     notificacionPersonalizadaGuardar.notificacion
-    //   );
-    //   expect(notificacionPersonalizadaDespues.tipo).toBe(
-    //     notificacionPersonalizadaGuardar.tipo
-    //   );
-    //   expect(notificacionPersonalizadaDespues.codigoEstablecimiento).toBe(
-    //     notificacionPersonalizadaGuardar.codigoEstablecimiento
-    //   );
-    //   expect(notificacionPersonalizadaDespues.nombreEstablecimiento).toBe(
-    //     notificacionPersonalizadaGuardar.nombreEstablecimiento
-    //   );
-    //   expect(notificacionPersonalizadaDespues.rutDeudor).toBe(
-    //     notificacionPersonalizadaGuardar.rutDeudor
-    //   );
-    //   expect(notificacionPersonalizadaDespues.nombreDeudor).toBe(
-    //     notificacionPersonalizadaGuardar.nombreDeudor
-    //   );
-    // });
-    // it("Should save multiple notificaciones and return errors", async () => {
-    //   const response = await request
-    //     .post("/inter-mongo-notificaciones/salida")
-    //     .set("Authorization", token)
-    //     .send(notificacionesPersonalizadasAInsertarSeed);
+      expect(response.body.error).toBe(
+        "No se recibieron notificaciones (arreglo vacío)."
+      );
+    });
+    it("Debería retornar error si no se envían notificaciones (objeto vacío).", async () => {
+      const response = await request
+        .post("/inter-mongo-notificaciones/salida")
+        .set("Authorization", token)
+        .send({});
 
-    //   expect(response.status).toBe(201);
+      expect(response.status).toBe(500);
+    });
+    it("Debería retornar error si alguna notificación no es válida.", async () => {
+      const response = await request
+        .post("/inter-mongo-notificaciones/salida")
+        .set("Authorization", token)
+        .send(notificacionesPersonalizadasAInsertarSeed);
 
-    //   const notificacionesPersonalizadasEnBD =
-    //     await NotificacionesPersonalizadas.find().exec();
+      expect(response.status).toBe(201);
 
-    //   expect(notificacionesPersonalizadasEnBD.length).toBe(10);
+      const notificacionesPersonalizadasEnBD =
+        await NotificacionesPersonalizadas.find().exec();
 
-    //   const { respuesta } = response.body;
+      expect(notificacionesPersonalizadasEnBD.length).toBe(9);
 
-    //   expect(respuesta.length).toBe(7);
-    //   expect(respuesta).toEqual([
-    //     {
-    //       afectado: 1,
-    //       realizado: true,
-    //       error: "La notificacion ya existe.",
-    //     },
-    //     {
-    //       afectado: 13,
-    //       realizado: true,
-    //       error: "",
-    //     },
-    //     {
-    //       afectado: 2,
-    //       realizado: true,
-    //       error: "La notificacion ya existe.",
-    //     },
-    //     {
-    //       afectado: 14,
-    //       realizado: true,
-    //       error: "",
-    //     },
-    //     {
-    //       afectado: 16,
-    //       realizado: false,
-    //       error:
-    //         "MongoServerError - E11000 duplicate key error collection: notificaciones_salida_test.notificaciones index: _id_ dup key: { _id: ObjectId('303030303030303030303031') }",
-    //     },
-    //     {
-    //       afectado: 15,
-    //       realizado: true,
-    //       error: "",
-    //     },
-    //     {
-    //       afectado: 4,
-    //       realizado: true,
-    //       error: "La notificacion ya existe.",
-    //     },
-    //   ]);
-    // });
+      const { respuesta } = response.body;
+
+      expect(respuesta.length).toBe(12);
+
+      expect(respuesta).toEqual([
+        {
+          realizado: false,
+          error:
+            "El nombreEstablecimiento es obligatorio. El codigoEstablecimiento es obligatorio. La fechaCreacion es obligatorio. El rutPaciente es obligatorio. El mensajeEs es obligatorio. El tituloEs es obligatorio. El correlativo es obligatorio.",
+        },
+        {
+          realizado: false,
+          error: "El correlativo es obligatorio.",
+        },
+        {
+          afectado: 12,
+          realizado: false,
+          error: "El tituloEs es obligatorio.",
+        },
+        {
+          afectado: 13,
+          realizado: false,
+          error: "El mensajeEs es obligatorio.",
+        },
+        {
+          afectado: 14,
+          realizado: false,
+          error: "El rutPaciente es obligatorio.",
+        },
+        {
+          afectado: 15,
+          realizado: false,
+          error: "La fechaCreacion es obligatorio.",
+        },
+        {
+          afectado: 16,
+          realizado: false,
+          error: "El codigoEstablecimiento es obligatorio.",
+        },
+        {
+          afectado: 17,
+          realizado: false,
+          error: "El codigoEstablecimiento 'HR' no es válido.",
+        },
+        {
+          afectado: 18,
+          realizado: false,
+          error: "El nombreEstablecimiento es obligatorio.",
+        },
+        {
+          afectado: 19,
+          realizado: false,
+          error:
+            "El nombreEstablecimiento 'ospital Regional Antofagasta Dr. Leonardo Guzmán' no es válido.",
+        },
+        {
+          afectado: 2,
+          realizado: false,
+          error:
+            "Existen 2 notificaciones con el correlativo 2 para el establecimiento HRA.",
+        },
+        {
+          afectado: 1,
+          realizado: true,
+          error: "La notificacion ya existe.",
+        },
+      ]);
+    });
   });
 });
