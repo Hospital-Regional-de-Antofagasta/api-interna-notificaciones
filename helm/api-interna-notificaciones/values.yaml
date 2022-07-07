@@ -17,6 +17,11 @@ fullnameOverride: ""
 secrets:
   apiKey: ""
   mongoUrl: "mongodb://mongo/hrapp"
+  apiUrl: ""
+  oneSignalAppId: ""
+  notificationLargeIcon: ""
+  oneSignalToken: ""
+  oneSignalUrl: ""
 
 service:
   type: NodePort

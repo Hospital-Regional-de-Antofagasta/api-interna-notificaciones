@@ -57,6 +57,31 @@ spec:
                 secretKeyRef:
                   name: {{ include "api-interna-notificaciones.secrets" . }}
                   key: mongo
+            - name: API_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "api-interna-notificaciones.secrets" . }}
+                  key: api-url
+            - name: ONE_SIGNAL_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "api-interna-notificaciones.secrets" . }}
+                  key: one-signal-app-id
+            - name: NOTIFICATION_LARGE_ICON
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "api-interna-notificaciones.secrets" . }}
+                  key: notification-large-icon
+            - name: ONE_SIGNAL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "api-interna-notificaciones.secrets" . }}
+                  key: one-signal-token
+            - name: ONE_SIGNAL_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "api-interna-notificaciones.secrets" . }}
+                  key: one-signal-url
 
           {{- if .Values.resources }}
           resources:
