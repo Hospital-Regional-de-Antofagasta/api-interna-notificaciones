@@ -51,6 +51,17 @@
     "nombreEstablecimiento": "Hospital Regional Antofagasta Dr. Leonardo Guzmán"
   },
   {
+    "correlativo": 15,
+    "tituloEs": "titulo 1",
+    "mensajeEs": "mensaje 1",
+    "tituloEn": "title 1",
+    "mensajeEn": "message 1",
+    "fechaCreacion": "2022-05-26",
+    "rutPaciente": "11111111-1",
+    "codigoEstablecimiento": "HRA",
+    "nombreEstablecimiento": "Hospital Regional Antofagasta Dr. Leonardo Guzmán"
+  },
+  {
     "correlativo": 16,
     "tituloEs": "titulo 1",
     "mensajeEs": "mensaje 1",
