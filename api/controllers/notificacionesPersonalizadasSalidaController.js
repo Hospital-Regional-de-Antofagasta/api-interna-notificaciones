@@ -19,6 +19,21 @@ exports.create = async (req, res) => {
           !(await isNotificacionValid(notificacion, notificacionesInsertadas))
         )
           continue;
+        // si existen multiples notificaciones con el mismo identificador en las recibidas, indicar el error
+        if (
+          notificaciones.filter(
+            (item) =>
+              item.correlativo === notificacion.correlativo &&
+              item.codigoEstablecimiento === notificacion.codigoEstablecimiento
+          ).length > 1
+        ) {
+          notificacionesInsertadas.push({
+            afectado: notificacion.correlativo,
+            realizado: false,
+            error: `Existen multiples notificaciones con el correlativo ${notificacion.correlativo} para el establecimiento ${notificacion.codigoEstablecimiento} en las notificaciones recibidas.`,
+          });
+          continue;
+        }
         // obtener notificacion con mismo identificador para evitar repetidas
         const notificacionesMismoIdentificador =
           await NotificacionesPersonalizadas.find({

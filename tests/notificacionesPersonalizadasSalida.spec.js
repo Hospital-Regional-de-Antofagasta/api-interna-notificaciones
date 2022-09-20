@@ -123,7 +123,7 @@ describe("Endpoints notificaciones salida", () => {
 
       const { respuesta } = response.body;
 
-      expect(respuesta.length).toBe(12);
+      expect(respuesta.length).toBe(13);
 
       expect(respuesta).toEqual([
         {
@@ -154,6 +154,11 @@ describe("Endpoints notificaciones salida", () => {
           afectado: 15,
           realizado: false,
           error: "La fechaCreacion es obligatorio.",
+        },
+        {
+          afectado: 15,
+          realizado: false,
+          error: "Existen multiples notificaciones con el correlativo 15 para el establecimiento HRA en las notificaciones recibidas.",
         },
         {
           afectado: 16,
