@@ -12,6 +12,7 @@ exports.create = async (req, res) => {
         .send({ error: "No se recibieron notificaciones (arreglo vacío)." });
     for (let datosNotificacion of notificaciones) {
       try {
+        if (req.timedout) return;
         const notificacion = new NotificacionesPersonalizadas(
           datosNotificacion
         );
@@ -69,6 +70,7 @@ exports.create = async (req, res) => {
           });
           continue;
         }
+        
         const oneSignalResponse = await sendPushNotification(
           notificacion.mensajeEs,
           notificacion.tituloEs,
@@ -82,7 +84,7 @@ exports.create = async (req, res) => {
           });
           continue;
         }
-        if (oneSignalResponse.recipients < 0) {
+        if (oneSignalResponse.recipients <= 0) {
           notificacionesInsertadas.push({
             afectado: notificacion.correlativo,
             realizado: false,
@@ -90,6 +92,7 @@ exports.create = async (req, res) => {
           });
           continue;
         }
+        
         notificacion.idOneSignal = oneSignalResponse.id;
         await NotificacionesPersonalizadas.create(notificacion);
         notificacionesInsertadas.push({
@@ -105,6 +108,7 @@ exports.create = async (req, res) => {
         });
       }
     }
+    if (req.timedout) return;
     res.status(201).send({
       respuesta: notificacionesInsertadas,
     });
