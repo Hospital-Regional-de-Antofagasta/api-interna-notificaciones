@@ -44,38 +44,39 @@ exports.create = async (req, res) => {
           continue;
         }
         // si la notificacion no existe, se envia y se inserta
-        const idsSuscriptor = await getIdsSuscriptor(notificacion.rutPaciente);
+        const idsOneSignal = await getIdsSuscriptor(notificacion.rutPaciente);
 
-        if (!Array.isArray(idsSuscriptor)) {
+        if (!Array.isArray(idsOneSignal)) {
           notificacionesInsertadas.push({
             afectado: notificacion.correlativo,
             realizado: false,
-            error: `${idsSuscriptor.name} - ${idsSuscriptor.message}`,
+            error: `${idsOneSignal.name} - ${idsOneSignal.message}`,
           });
           continue;
         }
-        const oneSignalResponse = await sendPushNotification(
-          notificacion.mensajeEs,
-          notificacion.tituloEs,
-          idsSuscriptor
-        );
-        if (!oneSignalResponse.id) {
+        const { idsSuscriptorOneSignalResponse, idsExternosOneSignalResponse } =
+          await sendPushNotification(
+            notificacion.mensajeEs,
+            notificacion.tituloEs,
+            idsOneSignal
+          );
+
+        if (
+          !idsSuscriptorOneSignalResponse?.id &&
+          !idsExternosOneSignalResponse?.id
+        ) {
           notificacionesInsertadas.push({
             afectado: notificacion.correlativo,
             realizado: false,
-            error: `${idOneSignal.name} - ${idOneSignal.message}`,
+            error: `Envío con id suscriptor: ${JSON.stringify(
+              idsSuscriptorOneSignalResponse
+            )} | Envío con external id: ${JSON.stringify(
+              idsExternosOneSignalResponse
+            )}`,
           });
           continue;
         }
-        if (oneSignalResponse.recipients < 0) {
-          notificacionesInsertadas.push({
-            afectado: notificacion.correlativo,
-            realizado: false,
-            error: `Notificación no recibida.`,
-          });
-          continue;
-        }
-        notificacion.idOneSignal = oneSignalResponse.id;
+        notificacion.idOneSignal = `${idsSuscriptorOneSignalResponse?.id};${idsExternosOneSignalResponse?.id};`;
         await NotificacionesPersonalizadas.create(notificacion);
         notificacionesInsertadas.push({
           afectado: notificacion.correlativo,
